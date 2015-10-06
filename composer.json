@@ -1,0 +1,19 @@
+{
+    "name": "phasty/service",
+    "require-dev": {
+        "phpunit/phpunit": "^5.0"
+    },
+    "authors": [
+        {
+            "name": "lockalister",
+            "email": "lockalister@gmail.com"
+        }
+    ],
+    "autoload" : {
+        "psr-4" : {
+            "Phasty\\Service\\" : "src"
+        }
+    },
+    "minimum-stability": "dev",
+    "require": {}
+}

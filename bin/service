@@ -1,0 +1,42 @@
+<?php
+/**
+ * This file is part of Phasty\Service
+ *
+ * (c) Dmitry Cheremnykh <lockalister@gmail.com>
+ *
+ * For the full copyright and license information, please view the LICENSE
+ * file that was distributed with this source code.
+ */
+function notImplemented() {
+    header("HTTP/1.1 501 Not Implemented");
+    echo( '{ "message": "api class not found" }' );
+}
+
+$done = false;
+foreach ([ "/../autoload.php", "/../vendor/autoload.php" ] as  $file ) {
+    if (!file_exists(__DIR__ . $file)) continue;
+    require __DIR__ . $file;
+    $done = true;
+}
+if (!$done) {
+    header("HTTP/1.1 500 Internal Server Error");
+    die('{ "message": "Autoloader not found" }');
+}
+unset($done, $file);
+
+
+$arguments = explode("/", $_SERVER[ "PATH_INFO" ]);
+$method = array_pop($arguments);
+$class = implode("\\", $arguments);
+
+if (!class_exists($class, true) || !is_callable([ $class, $method ])) {
+    notImplemented(); exit;
+}
+
+$instance = new $class;
+
+if (!$instance instanceof \Phasty\Service\IService) {
+    notImplemented(); exit;
+}
+
+echo json_encode($instance->$method());
