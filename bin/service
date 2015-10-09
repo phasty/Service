@@ -12,31 +12,51 @@ function notImplemented() {
     echo( '{ "message": "api class not found" }' );
 }
 
-$done = false;
-foreach ([ "/../autoload.php", "/../vendor/autoload.php" ] as  $file ) {
-    if (!file_exists(__DIR__ . $file)) continue;
-    require __DIR__ . $file;
-    $done = true;
-}
-if (!$done) {
-    header("HTTP/1.1 500 Internal Server Error");
-    die('{ "message": "Autoloader not found" }');
-}
-unset($done, $file);
-
-
-$arguments = explode("/", $_SERVER[ "PATH_INFO" ]);
-$method = array_pop($arguments);
-$class = implode("\\", $arguments);
-
-if (!class_exists($class, true) || !is_callable([ $class, $method ])) {
-    notImplemented(); exit;
+function findAutoloader() {
+    $done = false;
+    foreach ([ "/../../../autoload.php", "/../vendor/autoload.php" ] as  $file ) {
+        if (!file_exists(__DIR__ . $file)) continue;
+        require __DIR__ . $file;
+        $done = true;
+    }
+    if (!$done) {
+        header("HTTP/1.1 500 Internal Server Error");
+        die('{ "message": "Autoloader not found" }');
+    }
+    unset($done, $file);
 }
 
-$instance = new $class;
-
-if (!$instance instanceof \Phasty\Service\IService) {
-    notImplemented(); exit;
+function getClassAndMethod() {
+    $arguments = explode("/", $_SERVER[ "PHP_SELF" ]);
+    $method = array_pop($arguments);
+    return [ implode("\\", $arguments), $method ];
 }
 
-echo json_encode($instance->$method());
+function findAndCheckInstance($class, $method) {
+    if (!class_exists($class, true) || !is_callable([ $class, $method ])) {
+        notImplemented(); exit;
+    }
+
+    $instance = new $class;
+
+    if (!$instance instanceof \Phasty\Service\IService) {
+        notImplemented(); exit;
+    }
+    return $instance;
+}
+
+function callInstance($instance, $method) {
+    try {
+        echo json_encode([ "result" => $instance->$method((new \Phasty\Service\Input)->getData()) ]);
+    } catch (\Exception $e) {
+        header("HTTP/1.1 500 Internal Server Error");
+        die(json_encode([ "message" => $e->getMessage() ]));
+    }
+}
+
+header("Content-Type: application/json");
+
+findAutoloader();
+list($class, $method) = getClassAndMethod();
+$instance = findAndCheckInstance($class, $method);
+callInstance($instance, $method);
