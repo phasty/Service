@@ -1,7 +1,7 @@
 #!/usr/bin/env php
 <?php
 $wd = sys_get_temp_dir();
-$sourceDir  = realpath(__DIR__ . "/../..");
+$sourceDir  = realpath(__DIR__ . "/../../../..");
 $vendorDir  = "$sourceDir/vendor";
 $binDir     = "$vendorDir/bin";
 $srcDir     = "$sourceDir/src";
