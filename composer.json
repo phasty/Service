@@ -16,5 +16,5 @@
     },
     "minimum-stability": "dev",
     "require": {},
-    "bin": [ "bin/service" ]
+    "bin": [ "bin/service.php", "bin/build.php" ]
 }

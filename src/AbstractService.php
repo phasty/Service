@@ -10,8 +10,7 @@ namespace Phasty\Service {
          */
         protected function assertEmpty(array $data) {
             if (!empty($data)) {
-                header("HTTP/1.1 501 Not Implemented");
-                die('{ "message": "Unknown arguments passed" }');
+                $this->fail(501, "Not Implemented", "Unknown arguments passed");
             }
         }
 
@@ -31,6 +30,15 @@ namespace Phasty\Service {
             $result = $data[ $key ];
             unset($data[ $key ]);
             return $result;
+        }
+
+        protected function error404($message) {
+            $this->fail(404, "Not Found", $message);
+        }
+
+        private function fail($code, $httpMessage, $message) {
+            header("HTTP/1.1 $code $httpMessage");
+            die(json_encode(compact("message")));
         }
     }
 }

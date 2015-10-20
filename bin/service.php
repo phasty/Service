@@ -9,7 +9,7 @@
  */
 function notImplemented() {
     header("HTTP/1.1 501 Not Implemented");
-    echo( '{ "message": "api class not found" }' );
+    echo( '{ "message": "api class not implemented" }' );
 }
 
 function findAutoloader() {
@@ -23,7 +23,6 @@ function findAutoloader() {
         header("HTTP/1.1 500 Internal Server Error");
         die('{ "message": "Autoloader not found" }');
     }
-    unset($done, $file);
 }
 
 function getClassAndMethod() {
@@ -47,6 +46,7 @@ function findAndCheckInstance($class, $method) {
 
 function callInstance($instance, $method) {
     try {
+        // sleep(1);
         echo json_encode([ "result" => $instance->$method((new \Phasty\Service\Input)->getData()) ]);
     } catch (\Exception $e) {
         header("HTTP/1.1 500 Internal Server Error");
