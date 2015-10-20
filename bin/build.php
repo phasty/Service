@@ -31,4 +31,4 @@ $iterator->append(
     )
 );
 $phar->buildFromIterator($iterator, $sourceDir);
-$phar->setStub($phar->createDefaultStub("vendor/phasty/service/bin/service", "vendor/phasty/service/bin/service"));
+$phar->setStub($phar->createDefaultStub("vendor/phasty/service/bin/service.php", "vendor/phasty/service/bin/service.php"));
