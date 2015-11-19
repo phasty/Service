@@ -47,7 +47,9 @@ function findAndCheckInstance($class, $method) {
 function callInstance($instance, $method) {
     try {
         // sleep(1);
-        echo json_encode([ "result" => $instance->$method((new \Phasty\Service\Input)->getData()) ]);
+        $result = json_encode([ "result" => $instance->$method((new \Phasty\Service\Input)->getData()) ]);
+        header("Content-Length: " . strlen($result));
+        echo $result;
     } catch (\Exception $e) {
         header("HTTP/1.1 500 Internal Server Error");
         die(json_encode([ "message" => $e->getMessage() ]));
