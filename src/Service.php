@@ -1,6 +1,6 @@
 <?php
-namespace Phasty\Service {
-    class Service extends AbstractService  {
+namespace Phasty {
+    class Service {
 
         protected static function internalServerError($message) {
             header("HTTP/1.1 500 Internal Server Error");
