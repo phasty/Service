@@ -12,10 +12,7 @@
     "autoload" : {
         "psr-4" : {
             "Phasty\\Service\\" : "src"
-        },
-        "classmap" : [
-            "src/Service.php"
-        ]
+        }
     },
     "minimum-stability": "dev",
     "require": {},

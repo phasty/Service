@@ -1,6 +1,6 @@
 <?php
-namespace Phasty {
-    class Service {
+namespace Phasty\Service {
+    class Router {
 
         protected static function internalServerError($message) {
             header("HTTP/1.1 500 Internal Server Error");
@@ -25,7 +25,7 @@ namespace Phasty {
 
             $instance = new $class;
 
-            if (!$instance instanceof \Phasty\Service\IService) {
+            if (!$instance instanceof IService) {
                 static::notImplemented();
             }
             return $instance;
@@ -33,7 +33,7 @@ namespace Phasty {
 
         protected static function callInstance($instance, $method) {
             try {
-                $result = json_encode([ "result" => $instance->$method((new \Phasty\Service\Input)->getData()) ]);
+                $result = json_encode([ "result" => $instance->$method((new Input)->getData()) ]);
                 header("Content-Length: " . strlen($result));
                 echo $result;
             } catch (\Exception $e) {
@@ -41,7 +41,7 @@ namespace Phasty {
             }
         }
 
-        final public static function process() {
+        final public static function route() {
             header("Content-Type: application/json");
             list($class, $method) = static::getClassAndMethod();
             $instance = static::findAndCheckInstance($class, $method);
