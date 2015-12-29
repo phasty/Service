@@ -2,9 +2,6 @@
     "name": "phasty/service",
     "description": "",
     "license": "MIT",
-    "require-dev": {
-        "phpunit/phpunit": "^5.0"
-    },
     "authors": [
         {
             "name": "lockalister",
@@ -18,5 +15,9 @@
     },
     "minimum-stability": "dev",
     "require": {},
+    "require-dev": {
+        "squizlabs/php_codesniffer": "2.*",
+        "phpunit/phpunit": "^5.0"
+    },
     "bin": [ "bin/build.php" ]
 }
