@@ -1,6 +1,6 @@
 {
     "name": "phasty/service",
-    "description": "",
+    "description": "Module gives REST access to regular php methods by addressing tham by their namespace, class name and method name",
     "license": "MIT",
     "authors": [
         {
