@@ -10,7 +10,7 @@ namespace Phasty\Service {
          */
         protected function assertEmpty(array $data) {
             if (!empty($data)) {
-                $this->fail(501, "Not Implemented", "Unknown arguments passed");
+                $this->fail(400, "Bad Request", "Unknown arguments passed");
             }
         }
 
