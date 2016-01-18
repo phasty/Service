@@ -36,6 +36,10 @@ namespace Phasty\Service {
             $this->fail(404, "Not Found", $message);
         }
 
+        protected function error403($message) {
+            $this->fail(403, "Forbidden", $message);
+        }
+
         private function fail($code, $httpMessage, $message) {
             header("HTTP/1.1 $code $httpMessage");
             die(json_encode(compact("message")));
