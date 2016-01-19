@@ -2,11 +2,6 @@
 namespace Phasty\Service {
     class Router {
 
-        protected static function internalServerError($message) {
-            http_response_code(500);
-            die(json_encode([ "message" => $message ]));
-        }
-
         protected static function notImplemented() {
             http_response_code(501);
             die(json_encode([ "message" => "api class not implemented" ]));
@@ -38,11 +33,8 @@ namespace Phasty\Service {
                 echo $result;
             } catch (\Exception $exception) {
                 $exceptionClass = get_class($exception);
-                if (isset($exceptionMappings[ $exceptionClass ])) {
-                    $instance->fail($exceptionMappings[ $exceptionClass ], $exception->getMessage());
-                } else {
-                    static::internalServerError($exception->getMessage());
-                }
+                $httpCode = isset($exceptionMappings[ $exceptionClass ]) ? $exceptionMappings[ $exceptionClass ] : 500;
+                $instance->fail($httpCode, $exception->getMessage());
             }
         }
 
