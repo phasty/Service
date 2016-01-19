@@ -31,17 +31,23 @@ namespace Phasty\Service {
             return $instance;
         }
 
-        protected static function callInstance($instance, $method) {
+        protected static function callInstance(IService $instance, $method, array $exceptionMappings = []) {
             try {
                 $result = json_encode([ "result" => $instance->$method((new Input)->getData()) ]);
                 header("Content-Length: " . strlen($result));
                 echo $result;
-            } catch (\Exception $e) {
-                static::internalServerError($e->getMessage());
+            } catch (\Exception $exception) {
+                $exceptionClass = get_class($exception);
+                if (isset($exceptionMappings[ $exceptionClass ])) {
+                    list($httpCode, $httpMessage) = $exceptionMappings[ $exceptionClass ];
+                    $instance->fail($httpCode, $httpMessage, $exception->getMessage());
+                } else {
+                    static::internalServerError($exception->getMessage());
+                }
             }
         }
 
-        final public static function route() {
+        final public static function route(array $exceptionMappings = []) {
             header("Content-Type: application/json");
             list($class, $method) = static::getClassAndMethod();
             $instance = static::findAndCheckInstance($class, $method);

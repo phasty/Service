@@ -32,11 +32,11 @@ namespace Phasty\Service {
             return $result;
         }
 
-        protected function error404($message) {
+        public function error404($message) {
             $this->fail(404, "Not Found", $message);
         }
 
-        private function fail($code, $httpMessage, $message) {
+        public function fail($code, $httpMessage, $message) {
             header("HTTP/1.1 $code $httpMessage");
             die(json_encode(compact("message")));
         }
