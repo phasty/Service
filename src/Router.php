@@ -51,7 +51,7 @@ namespace Phasty\Service {
             header("Content-Type: application/json");
             list($class, $method) = static::getClassAndMethod();
             $instance = static::findAndCheckInstance($class, $method);
-            static::callInstance($instance, $method);
+            static::callInstance($instance, $method, $exceptionMappings);
         }
 
     }
