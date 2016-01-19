@@ -2,7 +2,7 @@
 namespace Phasty\Service {
     interface IService {
 
-        function fail($code, $httpMessage, $message);
+        function fail($code, $message);
 
     }
 }

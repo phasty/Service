@@ -10,7 +10,7 @@ namespace Phasty\Service {
          */
         protected function assertEmpty(array $data) {
             if (!empty($data)) {
-                $this->fail(400, "Bad Request", "Unknown arguments passed");
+                $this->fail(400, "Unknown arguments passed");
             }
         }
 
@@ -33,11 +33,11 @@ namespace Phasty\Service {
         }
 
         public function error404($message) {
-            $this->fail(404, "Not Found", $message);
+            $this->fail(404, $message);
         }
 
-        public function fail($code, $httpMessage, $message) {
-            header("HTTP/1.1 $code $httpMessage");
+        public function fail($code, $message) {
+            http_response_code($code);
             die(json_encode(compact("message")));
         }
     }

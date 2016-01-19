@@ -11,5 +11,10 @@ namespace Phasty\Service {
                 "message" => "test service execution result"
             ];
         }
+
+        public function fail($code, $message) {
+            throw new \Exception($message, $code);
+        }
+
     }
 }
