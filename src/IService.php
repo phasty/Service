@@ -1,4 +1,8 @@
 <?php
 namespace Phasty\Service {
-    interface IService {}
+    interface IService {
+
+        function fail($code, $message);
+
+    }
 }

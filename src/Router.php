@@ -2,13 +2,8 @@
 namespace Phasty\Service {
     class Router {
 
-        protected static function internalServerError($message) {
-            header("HTTP/1.1 500 Internal Server Error");
-            die(json_encode([ "message" => $message ]));
-        }
-
         protected static function notImplemented() {
-            header("HTTP/1.1 501 Not Implemented");
+            http_response_code(501);
             die(json_encode([ "message" => "api class not implemented" ]));
         }
 
@@ -31,21 +26,23 @@ namespace Phasty\Service {
             return $instance;
         }
 
-        protected static function callInstance($instance, $method) {
+        protected static function callInstance(IService $instance, $method, array $exceptionMappings = []) {
             try {
                 $result = json_encode([ "result" => $instance->$method((new Input)->getData()) ]);
                 header("Content-Length: " . strlen($result));
                 echo $result;
-            } catch (\Exception $e) {
-                static::internalServerError($e->getMessage());
+            } catch (\Exception $exception) {
+                $exceptionClass = get_class($exception);
+                $httpCode = isset($exceptionMappings[ $exceptionClass ]) ? $exceptionMappings[ $exceptionClass ] : 500;
+                $instance->fail($httpCode, $exception->getMessage());
             }
         }
 
-        final public static function route() {
+        final public static function route(array $exceptionMappings = []) {
             header("Content-Type: application/json");
             list($class, $method) = static::getClassAndMethod();
             $instance = static::findAndCheckInstance($class, $method);
-            static::callInstance($instance, $method);
+            static::callInstance($instance, $method, $exceptionMappings);
         }
 
     }
