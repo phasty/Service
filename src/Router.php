@@ -8,23 +8,16 @@ namespace Phasty\Service {
             die(json_encode([ "message" => "api class not implemented" ]));
         }
 
-        protected static function getClassAndMethod(array $classMappings) {
-            if (empty($classMappings)) {
+        protected static function getClassAndMethod(array $routeMappings) {
+            if (empty($routeMappings)) {
                 static::notImplemented();
             }
             $requestedUri = $_SERVER[ "PHP_SELF" ];
-            $methodSeparatorPos = strrpos($requestedUri, "/");
-            if (empty($methodSeparatorPos)) {
-                static::notImplemented();
-            }
-            $method = substr($requestedUri, $methodSeparatorPos + 1);
-            $classKey = substr($requestedUri, 0, $methodSeparatorPos);
-            if (isset($classMappings[ $classKey ])) {
-                $class = $classMappings[ $classKey ];
+            if (isset($routeMappings[ $requestedUri ])) {
+                return $routeMappings[ $requestedUri ];
             } else {
                 static::notImplemented();
             }
-            return [ $class, $method ];
         }
 
         protected static function findAndCheckInstance($class, $method) {
