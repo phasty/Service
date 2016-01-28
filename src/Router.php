@@ -52,11 +52,11 @@ namespace Phasty\Service {
             }
         }
 
-        final public static function route(array $classMappings, array $exceptionMappings = []) {
+        final public static function route(array $settings) {
             header("Content-Type: application/json");
-            list($class, $method) = static::getClassAndMethod($classMappings);
+            list($class, $method) = static::getClassAndMethod($settings[ "routes" ]);
             $instance = static::findAndCheckInstance($class, $method);
-            static::callInstance($instance, $method, $exceptionMappings);
+            static::callInstance($instance, $method, $settings[ "exceptions" ]);
         }
 
     }
