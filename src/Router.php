@@ -1,5 +1,6 @@
 <?php
 namespace Phasty\Service {
+
     class Router {
 
         protected static function notImplemented() {
@@ -7,10 +8,23 @@ namespace Phasty\Service {
             die(json_encode([ "message" => "api class not implemented" ]));
         }
 
-        protected static function getClassAndMethod() {
-            $arguments = explode("/", $_SERVER[ "PHP_SELF" ]);
-            $method = array_pop($arguments);
-            return [ implode("\\", $arguments), $method ];
+        protected static function getClassAndMethod(array $classMappings) {
+            if (empty($classMappings)) {
+                static::notImplemented();
+            }
+            $requestedUri = $_SERVER[ "PHP_SELF" ];
+            $methodSeparatorPos = strrpos($requestedUri, "/");
+            if (empty($methodSeparatorPos)) {
+                static::notImplemented();
+            }
+            $method = substr($requestedUri, $methodSeparatorPos + 1);
+            $classKey = substr($requestedUri, 0, $methodSeparatorPos);
+            if (isset($classMappings[ $classKey ])) {
+                $class = $classMappings[ $classKey ];
+            } else {
+                static::notImplemented();
+            }
+            return [ $class, $method ];
         }
 
         protected static function findAndCheckInstance($class, $method) {
@@ -38,11 +52,11 @@ namespace Phasty\Service {
             }
         }
 
-        final public static function route(array $exceptionMappings = []) {
+        final public static function route(array $settings) {
             header("Content-Type: application/json");
-            list($class, $method) = static::getClassAndMethod();
+            list($class, $method) = static::getClassAndMethod($settings[ "routes" ]);
             $instance = static::findAndCheckInstance($class, $method);
-            static::callInstance($instance, $method, $exceptionMappings);
+            static::callInstance($instance, $method, $settings[ "exceptions" ]);
         }
 
     }
