@@ -1,5 +1,6 @@
 <?php
 namespace Phasty\Service {
+
     class Router {
 
         protected static function notImplemented() {
@@ -17,18 +18,10 @@ namespace Phasty\Service {
                 static::notImplemented();
             }
             $method = substr($requestedUri, $methodSeparatorPos + 1);
-            $apiAndClassKey = substr($requestedUri, 0, $methodSeparatorPos);
-            $class = null;
-            foreach ($classMappings as $api => $apiClassMappings) {
-                if (substr($apiAndClassKey, 0, strlen($api)) == $api) {
-                    $classKey = substr($apiAndClassKey, strlen($api));
-                    if (isset($apiClassMappings[ $classKey ])) {
-                        $class = $apiClassMappings[ $classKey ];
-                    }
-                    break;
-                }
-            }
-            if (is_null($class)) {
+            $classKey = substr($requestedUri, 0, $methodSeparatorPos);
+            if (isset($classMappings[ $classKey ])) {
+                $class = $classMappings[ $classKey ];
+            } else {
                 static::notImplemented();
             }
             return [ $class, $method ];
