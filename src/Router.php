@@ -9,9 +9,6 @@ namespace Phasty\Service {
         }
 
         protected static function getClassAndMethod(array $routeMappings) {
-            if (empty($routeMappings)) {
-                static::notImplemented();
-            }
             $requestedUri = $_SERVER[ "PHP_SELF" ];
             if (isset($routeMappings[ $requestedUri ])) {
                 return $routeMappings[ $requestedUri ];
