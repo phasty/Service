@@ -10,24 +10,10 @@ namespace Phasty\Service {
 
         protected static function getClassAndMethod(array $routeMappings) {
             $requestedUri = $_SERVER[ "PHP_SELF" ];
-            if (isset($routeMappings[ $requestedUri ])) {
-                return $routeMappings[ $requestedUri ];
-            } else {
+            if (empty($routeMappings[ $requestedUri ])) {
                 static::notImplemented();
             }
-        }
-
-        protected static function findAndCheckInstance($class, $method) {
-            if (!class_exists($class, true) || !is_callable([ $class, $method ])) {
-                static::notImplemented();
-            }
-
-            $instance = new $class;
-
-            if (!$instance instanceof IService) {
-                static::notImplemented();
-            }
-            return $instance;
+            return $routeMappings[ $requestedUri ];
         }
 
         protected static function callInstance(IService $instance, $method, array $exceptionMappings = []) {
@@ -45,8 +31,7 @@ namespace Phasty\Service {
         final public static function route(array $settings) {
             header("Content-Type: application/json");
             list($class, $method) = static::getClassAndMethod($settings[ "routes" ]);
-            $instance = static::findAndCheckInstance($class, $method);
-            static::callInstance($instance, $method, $settings[ "exceptions" ]);
+            static::callInstance(new $class, $method, $settings[ "exceptions" ]);
         }
 
     }
