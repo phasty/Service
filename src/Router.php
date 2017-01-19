@@ -1,37 +1,42 @@
 <?php
 namespace Phasty\Service {
 
-    class Router {
+    use Phasty\Service\Error;
+    use Phasty\Service\AbstractService;
 
-        protected static function notImplemented() {
-            http_response_code(501);
-            die(json_encode([ "message" => "api class not implemented" ]));
-        }
+    class Router {
 
         protected static function getClassAndMethod(array $routeMappings) {
             $requestedUri = $_SERVER[ "PHP_SELF" ];
             if (empty($routeMappings[ $requestedUri ])) {
-                static::notImplemented();
+                $error = AbstractService::getError(IService::API_NOT_IMPLEMENTED);
+                throw new Error($error[1], $error[0]);
             }
             return $routeMappings[ $requestedUri ];
         }
 
-        protected static function callInstance(IService $instance, $method, array $exceptionMappings = []) {
+        protected static function getResult(array $settings) {
             try {
-                $result = json_encode([ "result" => $instance->$method((new Input)->getData()) ]);
-                header("Content-Length: " . strlen($result));
-                echo $result;
-            } catch (\Exception $exception) {
-                $exceptionClass = get_class($exception);
-                $httpCode = isset($exceptionMappings[ $exceptionClass ]) ? $exceptionMappings[ $exceptionClass ] : 500;
-                $instance->fail($httpCode, $exception->getMessage());
+                list($class, $method) = static::getClassAndMethod($settings[ "routes" ]);
+                $instance = new $class;
+                return json_encode([ "result" => $instance->$method((new Input)->getData()) ]);
+            } catch (\Exception $e) {
+                $errorCode = ($e instanceof Error) ? $e->getCode() : 0;
+                if (empty($class) || empty(class_parents($class)[AbstractService::class])) {
+                    $class = AbstractService::class;
+                }
+
+                http_response_code($class::getError($errorCode)[0]);
+                return json_encode(["code" => $errorCode, "message" => $e->getMessage()]);
             }
         }
 
-        final public static function route(array $settings) {
+        public static function route(array $settings) {
+            $result = getResult(array $settings);
+
             header("Content-Type: application/json");
-            list($class, $method) = static::getClassAndMethod($settings[ "routes" ]);
-            static::callInstance(new $class, $method, $settings[ "exceptions" ]);
+            header("Content-Length: " . strlen($result));
+            echo $result;
         }
 
     }

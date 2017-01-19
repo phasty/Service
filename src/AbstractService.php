@@ -1,6 +1,17 @@
 <?php
 namespace Phasty\Service {
+
+    use Phasty\Service\Error;
+
+    /**
+     * Class AbstractService
+     * Класс, для создания ресурсов (API) в сервисе
+     *
+     * @package Phasty\Service
+     */
     abstract class AbstractService implements IService {
+
+        protected static $errors = [];
         /**
          * Проверяет, что не переданы лишние параметры в сервис
          *
@@ -10,7 +21,7 @@ namespace Phasty\Service {
          */
         protected function assertEmpty(array $data) {
             if (!empty($data)) {
-                $this->fail(400, "Unknown arguments passed");
+                $this->error(BAD_REQUEST);
             }
         }
 
@@ -32,13 +43,37 @@ namespace Phasty\Service {
             return $result;
         }
 
-        public function error404($message) {
-            $this->fail(404, $message);
+        /**
+         * Функция устанавливает статус http-ответа и выбрасывает правильное исключение
+         * с кодом и текстом ошибки
+         * @param  int    $code    Код ошибки
+         * @param  string $message Текст ошибки (если для данного кода нужно отправить нестандартный текст)
+         *
+         * @throws Error
+         */
+        public function error($code, $message = "") {
+            $error = static::getError($code);
+
+            throw new Error(empty($message) ? $error[1] : $message, $code);
         }
 
-        public function fail($code, $message) {
-            http_response_code($code);
-            die(json_encode(compact("message")));
+        /**
+         * Функция возвращает ошибку по ее коду
+         *
+         * @param  int    $code    Код ошибки
+         *
+         * @return array $error
+         */
+        public static function getError($code) {
+            if (!empty(IService::COMMON_ERRORS[$code])) {
+                // Одна из базовых ошибок
+                return IService::COMMON_ERRORS[$code];
+            } elseif (!empty(static::$errors[$code])) {
+                // Одна из специфических ошибок сервиса
+                return static::$errors[$code]
+            } else {
+                return IService::COMMON_ERRORS[IService::INTERNAL_ERROR];
+            }
         }
     }
 }
