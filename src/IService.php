@@ -15,7 +15,7 @@ namespace Phasty\Service {
             BAD_REQUEST         => [ 400, "Unknown arguments passed." ]
         ];
 
-        function error($code, $message);
+        function fail($code, $message);
 
     }
 }

@@ -21,7 +21,7 @@ namespace Phasty\Service {
          */
         protected function assertEmpty(array $data) {
             if (!empty($data)) {
-                $this->error(BAD_REQUEST);
+                $this->fail(BAD_REQUEST);
             }
         }
 
@@ -51,7 +51,7 @@ namespace Phasty\Service {
          *
          * @throws Error
          */
-        public function error($code, $message = "") {
+        public function fail($code, $message = "") {
             $error = static::getError($code);
 
             throw new Error(empty($message) ? $error[1] : $message, $code);
