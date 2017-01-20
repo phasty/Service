@@ -1,7 +1,7 @@
 <?php
 namespace Phasty\Service {
 
-    use Phasty\Service\Error;
+    use Phasty\Service\Exception;
 
     /**
      * Class AbstractService
@@ -9,9 +9,8 @@ namespace Phasty\Service {
      *
      * @package Phasty\Service
      */
-    abstract class AbstractService implements IService {
+    abstract class AbstractService {
 
-        protected static $errors = [];
         /**
          * Проверяет, что не переданы лишние параметры в сервис
          *
@@ -21,7 +20,7 @@ namespace Phasty\Service {
          */
         protected function assertEmpty(array $data) {
             if (!empty($data)) {
-                $this->fail(BAD_REQUEST);
+                throw new Exception\BadRequest;
             }
         }
 
@@ -41,39 +40,6 @@ namespace Phasty\Service {
             $result = $data[ $key ];
             unset($data[ $key ]);
             return $result;
-        }
-
-        /**
-         * Функция выбрасывает правильное исключение с кодом и текстом ошибки
-         *
-         * @param  int    $code    Код ошибки
-         * @param  string $message Текст ошибки (если для данного кода нужно отправить нестандартный текст)
-         *
-         * @throws Error
-         */
-        public function fail($code, $message = "") {
-            $error = static::getError($code);
-
-            throw new Error(empty($message) ? $error[1] : $message, $code);
-        }
-
-        /**
-         * Функция возвращает ошибку по ее коду
-         *
-         * @param  int    $code    Код ошибки
-         *
-         * @return array $error
-         */
-        public static function getError($code) {
-            if (!empty(IService::COMMON_ERRORS[$code])) {
-                // Одна из базовых ошибок
-                return IService::COMMON_ERRORS[$code];
-            } elseif (!empty(static::$errors[$code])) {
-                // Одна из специфических ошибок сервиса
-                return static::$errors[$code]
-            } else {
-                return IService::COMMON_ERRORS[IService::INTERNAL_ERROR];
-            }
         }
     }
 }
