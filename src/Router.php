@@ -23,7 +23,7 @@ namespace Phasty\Service {
                 $e = ($e instanceof Error) ? $e : new Exception\InternalError($e->getMessage());
                 http_response_code($e->getHttpStatus());
                 // log::error("[ERROR: " . $e->getCode() . "] " . $e->getMessage());
-                return json_encode(["code" => $e->getCode()]);
+                return json_encode(["code" => $e->getCode(), "message" => $e->getMessage()]);
             }
         }
 

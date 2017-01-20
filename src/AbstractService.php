@@ -20,7 +20,7 @@ namespace Phasty\Service {
          */
         protected function assertEmpty(array $data) {
             if (!empty($data)) {
-                throw new Exception\BadRequest;
+                throw new Exception\BadRequest("Extra params was passed: '" . implode(", ", array_keys($data)) . "'.");
             }
         }
 
