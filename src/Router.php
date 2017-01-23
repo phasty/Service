@@ -106,6 +106,9 @@ namespace Phasty\Service {
                 ob_start();
                 static::setFormat($_SERVER["CONTENT_TYPE"]);
                 $result = static::getResult($requestedUri, static::getData());
+                // Заворачиваем результат в result. Это необходимо, чтобы сервис мог
+                // возвращать просто строку или число внутри json, а не только объект
+                $result = static::isJson() ? json_encode(["result" => $result]) : $result;
                 // Чистим весь левый вывод. Мы должны отдать только результат!
                 ob_end_clean();
             } catch (\Exception $e) {
@@ -113,12 +116,14 @@ namespace Phasty\Service {
                 http_response_code($e->getHttpStatus());
                 // todo: Нужно логировать ошибку. Но про механизм пока не договорились.
                 // log::error("[ERROR: " . $e->getCode() . "] " . $e->getMessage());
-                $result = ["code" => $e->getCode(), "message" => $e->getMessage()];
+                $result = static::isJson() ?
+                    json_encode(["code" => $e->getCode(), "message" => $e->getMessage()]) : $e->getMessage();
+
             }
 
             header("Content-Type: " . static::$format);
             header("Content-Length: " . strlen($result));
-            echo static::isJson() ? json_encode(["result" => $result]) : $result;
+            echo $result;
         }
 
     }
