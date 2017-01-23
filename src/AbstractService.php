@@ -15,8 +15,6 @@ namespace Phasty\Service {
          * Проверяет, что не переданы лишние параметры в сервис
          *
          * @param array $data Параметры выборки
-         *
-         * @param array $data
          */
         protected function assertEmpty(array $data) {
             if (!empty($data)) {
