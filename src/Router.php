@@ -106,7 +106,7 @@ namespace Phasty\Service {
                 ob_start();
                 static::setFormat($_SERVER["CONTENT_TYPE"]);
                 $result = static::getResult($requestedUri, static::getData());
-                if (!is_array($result)) {
+                if (static::isJson() && !is_array($result)) {
                     throw new Exception\InternalError("Результат обработки '$requestedUri' не array.");
                 }
                 // Чистим весь левый вывод. Мы должны отдать только результат!
