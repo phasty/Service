@@ -105,7 +105,7 @@ namespace Phasty\Service {
                 // Копим весь прямой вывод (ошибки, случайное echo от разработчика и т.д.)
                 ob_start();
                 static::setFormat($_SERVER["CONTENT_TYPE"]);
-                $result = getResult($requestedUri, static::getData());
+                $result = static::getResult($requestedUri, static::getData());
                 if (!is_array($result)) {
                     throw new Exception\InternalError("Результат обработки '$requestedUri' не array.");
                 }
