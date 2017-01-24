@@ -21,20 +21,19 @@ namespace Phasty\Service {
          * @param  array  $routeMappings  Массив ключ(uri) => [class, method]
          */
         public static function init(array $routeMappings) {
-            static::$routes = $config;
+            static::$routes = $routeMappings;
         }
 
         /**
          * Находит класс-обработчик и метод на основании запрошенного uri и конфига
          *
          * @param  string $requestedUri   Запрошенный uri
-         * @param  array  $routeMappings  Конфиг с маппингом uri - класс-метод
          *
          * @return array  Класс и метод для обработки запроса
          */
         protected static function getClassAndMethod($requestedUri) {
             if (empty(static::$routes[ $requestedUri ])) {
-                throw new Exception\ApiNotImplemented("Неизвестный ресурс '$requestedUri'.");
+                throw new Exception\ApiNotImplemented("Unresolved resource '$requestedUri'.");
             }
             return static::$routes[ $requestedUri ];
         }
@@ -47,7 +46,6 @@ namespace Phasty\Service {
          *
          * @param  string $requestedUri   Запрошенный uri
          * @param  mixed  $input          Входяций набор данных
-         * @param  array  $settings       Конфигурация для сервиса
          *
          * @return array  Результат обработки запроса
          */
@@ -58,10 +56,10 @@ namespace Phasty\Service {
         }
 
         /**
-         * Метод ожидает json-объект на входном потоке данных (в теле http-запроса)
-         * и пытается рапарсить его
+         * Метод читает тело http-запроса
+         * и пытается преобразовать его в зависимости от content-type
          *
-         * @return array  Ассоциативный массив данных из входящего запроса
+         * @return mixed  Тело запроса, или ассоциативный массив в случае content-type = application/json
          */
         public static function getData() {
             static $result = null;
@@ -87,10 +85,10 @@ namespace Phasty\Service {
         /**
          * Проверяет что текущий формат - json
          *
-         * @return boolean
+         * @return boolean  true - если conent-type = application/json
          */
         protected static function isJson() {
-            return ("application/json" == static::$format) ? true : false;
+            return "application/json" == static::$format;
         }
 
         /**

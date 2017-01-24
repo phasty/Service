@@ -11,8 +11,8 @@ namespace Phasty\Service {
      */
     abstract class Error extends \Exception {
 
-        public function __construct($message = "", $code = 0, \Exception $previous = null) {
-            return parent::__construct($message, static::getErrorCode(), $previous);
+        public function __construct($message = "") {
+            return parent::__construct($message, static::getErrorCode());
         }
 
         /**
