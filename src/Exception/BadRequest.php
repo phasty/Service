@@ -2,6 +2,7 @@
 namespace Phasty\Service\Exception {
 
     use Phasty\Service\Exceptions;
+    use Phasty\Service\ServiceError;
 
     /**
      * Class BadRequest
