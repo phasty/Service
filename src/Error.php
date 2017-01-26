@@ -23,7 +23,7 @@ namespace Phasty\Service {
          * @return int код ошибки
          */
         protected static function getErrorCode() {
-            return Exceptions::INTERNAL_ERROR;
+            return Exceptions::INTERNAL_SERVER_ERROR;
         }
 
         /**
