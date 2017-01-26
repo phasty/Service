@@ -1,5 +1,5 @@
 <?php
-namespace Phasty\Service {
+namespace Phasty\Service\Exception {
 
     use Phasty\Service\Exceptions;
 
