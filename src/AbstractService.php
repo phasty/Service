@@ -1,16 +1,26 @@
 <?php
 namespace Phasty\Service {
-    abstract class AbstractService implements IService {
+
+    use Phasty\Service\Exception\BadRequest;
+
+    /**
+     * Class AbstractService
+     * Класс, для создания ресурсов (API) в сервисе
+     *
+     * @package Phasty\Service
+     */
+    abstract class AbstractService {
+
         /**
          * Проверяет, что не переданы лишние параметры в сервис
          *
          * @param array $data Параметры выборки
          *
-         * @param array $data
+         * @throws BadRequest
          */
         protected function assertEmpty(array $data) {
             if (!empty($data)) {
-                $this->fail(400, "Unknown arguments passed");
+                throw new BadRequest("Extra params passed: '" . implode(", ", array_keys($data)) . "'.");
             }
         }
 
@@ -30,15 +40,6 @@ namespace Phasty\Service {
             $result = $data[ $key ];
             unset($data[ $key ]);
             return $result;
-        }
-
-        public function error404($message) {
-            $this->fail(404, $message);
-        }
-
-        public function fail($code, $message) {
-            http_response_code($code);
-            die(json_encode(compact("message")));
         }
     }
 }
