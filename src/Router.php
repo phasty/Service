@@ -2,6 +2,8 @@
 namespace Phasty\Service {
 
     use Phasty\Service\FatalError;
+    use Phasty\Service\Exception\InternalServerError;
+    use Phasty\Service\Exception\ApiNotImplemented;
 
     /**
      * Class Router
@@ -30,11 +32,11 @@ namespace Phasty\Service {
          *
          * @return array  Класс и метод для обработки запроса
          *
-         * @throws Exception\ApiNotImplemented
+         * @throws ApiNotImplemented
          */
         protected static function getClassAndMethod($requestedUri) {
             if (empty(static::$routes[ $requestedUri ])) {
-                throw new Exception\ApiNotImplemented("Unresolved resource '$requestedUri'.");
+                throw new ApiNotImplemented("Unresolved resource '$requestedUri'.");
             }
             return static::$routes[ $requestedUri ];
         }
@@ -111,7 +113,7 @@ namespace Phasty\Service {
                 // Чистим весь левый вывод. Мы должны отдать только результат!
                 ob_end_clean();
             } catch (\Exception $e) {
-                $e = ($e instanceof FatalError) ? $e : new Exception\InternalServerError($e->getMessage());
+                $e = ($e instanceof FatalError) ? $e : new InternalServerError($e->getMessage());
                 http_response_code($e->getHttpStatus());
                 // todo: Нужно логировать ошибку. Но про механизм пока не договорились.
                 // log::error("[ERROR: " . $e->getCode() . "] " . $e->getMessage());

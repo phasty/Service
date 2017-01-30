@@ -2,12 +2,12 @@
 namespace Phasty\Service {
 
     /**
-     * Class Error
+     * Class Errors
      * Класс, списка кодов ошибок
      *
      * @package Phasty\Service
      */
-    abstract class Error {
+    abstract class Errors {
 
         /** @var int  INTERNAL_SERVER_ERROR  Ошибка, возникающая в случае серверных сбоев (сервер не может обработать запрос из-за системного сбоя) */
         const INTERNAL_SERVER_ERROR = 1;

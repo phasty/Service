@@ -1,7 +1,7 @@
 <?php
 namespace Phasty\Service {
 
-    use Phasty\Service\Error;
+    use Phasty\Service\Errors;
 
     /**
      * Class FatalError
@@ -23,7 +23,7 @@ namespace Phasty\Service {
          * @return int код ошибки
          */
         protected static function getErrorCode() {
-            return Error::INTERNAL_SERVER_ERROR;
+            return Errors::INTERNAL_SERVER_ERROR;
         }
 
         /**

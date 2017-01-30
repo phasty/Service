@@ -1,7 +1,7 @@
 <?php
 namespace Phasty\Service\Exception {
 
-    use Phasty\Service\Error;
+    use Phasty\Service\Errors;
     use Phasty\Service\RequestError;
 
     /**
@@ -13,7 +13,7 @@ namespace Phasty\Service\Exception {
     final class BadRequest extends RequestError {
 
         protected static function getErrorCode() {
-            return Error::BAD_REQUEST;
+            return Errors::BAD_REQUEST;
         }
 
     }
