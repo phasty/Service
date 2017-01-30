@@ -1,7 +1,7 @@
 <?php
 namespace Phasty\Service {
 
-    use Phasty\Service\Exception;
+    use Phasty\Service\Exception\BadRequest;
 
     /**
      * Class AbstractService
@@ -15,10 +15,12 @@ namespace Phasty\Service {
          * Проверяет, что не переданы лишние параметры в сервис
          *
          * @param array $data Параметры выборки
+         *
+         * @throws BadRequest
          */
         protected function assertEmpty(array $data) {
             if (!empty($data)) {
-                throw new Exception\BadRequest("Extra params passed: '" . implode(", ", array_keys($data)) . "'.");
+                throw new BadRequest("Extra params passed: '" . implode(", ", array_keys($data)) . "'.");
             }
         }
 

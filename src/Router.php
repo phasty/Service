@@ -1,8 +1,7 @@
 <?php
 namespace Phasty\Service {
 
-    use Phasty\Service\Error;
-    use Phasty\Service\Exception;
+    use Phasty\Service\FatalError;
 
     /**
      * Class Router
@@ -30,6 +29,8 @@ namespace Phasty\Service {
          * @param  string $requestedUri   Запрошенный uri
          *
          * @return array  Класс и метод для обработки запроса
+         *
+         * @throws Exception\ApiNotImplemented
          */
         protected static function getClassAndMethod($requestedUri) {
             if (empty(static::$routes[ $requestedUri ])) {
@@ -110,7 +111,7 @@ namespace Phasty\Service {
                 // Чистим весь левый вывод. Мы должны отдать только результат!
                 ob_end_clean();
             } catch (\Exception $e) {
-                $e = ($e instanceof Error) ? $e : new Exception\InternalError($e->getMessage());
+                $e = ($e instanceof FatalError) ? $e : new Exception\InternalServerError($e->getMessage());
                 http_response_code($e->getHttpStatus());
                 // todo: Нужно логировать ошибку. Но про механизм пока не договорились.
                 // log::error("[ERROR: " . $e->getCode() . "] " . $e->getMessage());

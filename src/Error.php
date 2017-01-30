@@ -1,38 +1,22 @@
 <?php
 namespace Phasty\Service {
 
-    use Phasty\Service\Exceptions;
-
     /**
      * Class Error
-     * Класс, для критической ошибки
+     * Класс, списка кодов ошибок
      *
      * @package Phasty\Service
      */
-    abstract class Error extends \Exception {
+    abstract class Error {
 
-        public function __construct($message = "") {
-            return parent::__construct($message, static::getErrorCode());
-        }
+        /** @var int  INTERNAL_SERVER_ERROR  Ошибка, возникающая в случае серверных сбоев (сервер не может обработать запрос из-за системного сбоя) */
+        const INTERNAL_SERVER_ERROR = 1;
 
-        /**
-         * Возвращает код ошибки для класса.
-         * Метод должен быть переопределен в наследнике, для того, чтобы
-         * каждое исключение генерировало уникальный код.
-         *
-         * @return int код ошибки
-         */
-        protected static function getErrorCode() {
-            return Exceptions::INTERNAL_SERVER_ERROR;
-        }
+        /** @var int  API_NOT_IMPLEMENTED    Ошибка, возникающая в случае запроса на неизвестный ресурс API */
+        const API_NOT_IMPLEMENTED   = 2;
 
-        /**
-         * Возвращает статус http-ответа для данного вида ошибки
-         *
-         * @return int статус http-ответа
-         */
-        public function getHttpStatus() {
-            return 500;
-        }
+        /** @var int  BAD_REQUEST            Ошибка, возникающая в случае некорректного запроса (не хватает ключевых параметров и т.п.) */
+        const BAD_REQUEST           = 3;
+
     }
 }

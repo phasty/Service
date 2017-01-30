@@ -1,8 +1,8 @@
 <?php
 namespace Phasty\Service\Exception {
 
-    use Phasty\Service\Exceptions;
     use Phasty\Service\Error;
+    use Phasty\Service\FatalError;
 
     /**
      * Class InternalServerError
@@ -10,10 +10,10 @@ namespace Phasty\Service\Exception {
      *
      * @package Phasty\Service
      */
-    final class InternalServerError extends Error {
+    final class InternalServerError extends FatalError {
 
         protected static function getErrorCode() {
-            return Exceptions::INTERNAL_SERVER_ERROR;
+            return Error::INTERNAL_SERVER_ERROR;
         }
     }
 }

@@ -1,8 +1,8 @@
 <?php
 namespace Phasty\Service\Exception {
 
-    use Phasty\Service\Exceptions;
     use Phasty\Service\Error;
+    use Phasty\Service\FatalError;
 
     /**
      * Class ApiNotImplemented
@@ -10,10 +10,10 @@ namespace Phasty\Service\Exception {
      *
      * @package Phasty\Service
      */
-    final class ApiNotImplemented extends Error {
+    final class ApiNotImplemented extends FatalError {
 
         protected static function getErrorCode() {
-            return Exceptions::API_NOT_IMPLEMENTED;
+            return Error::API_NOT_IMPLEMENTED;
         }
 
     }

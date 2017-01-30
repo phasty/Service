@@ -2,13 +2,13 @@
 namespace Phasty\Service {
 
     /**
-     * Class ServiceError
+     * Class RequestError
      * Класс, для генерации обычной ошибки, которая является следствием стандартных проверок
      * в процессе исполнения скрипта.
      *
      * @package Phasty\Service
      */
-    abstract class ServiceError extends Error {
+    abstract class RequestError extends FatalError {
 
         public function getHttpStatus() {
             return 400;
