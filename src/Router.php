@@ -66,7 +66,7 @@ namespace Phasty\Service {
          */
         protected static function extractAppUid(&$input) {
             // Пока работаем только с json
-            if (static::isJson() && isset($input["app-uid"])) {
+            if (static::isJson() && array_key_exists("app-uid", $input)) {
                 static::$appUid = $input["app-uid"];
                 unset($input["app-uid"]);
             }
