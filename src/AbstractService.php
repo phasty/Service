@@ -34,7 +34,7 @@ namespace Phasty\Service {
          * @return mixed
          */
         protected function extract(&$data, $key, $default = null) {
-            if (!isset($data[ $key ])) {
+            if (!array_key_exists($key, $data)) {
                 return $default;
             }
             $result = $data[ $key ];
