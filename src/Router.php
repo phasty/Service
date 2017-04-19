@@ -15,6 +15,7 @@ namespace Phasty\Service {
 
         protected static $routes = [];
         protected static $format = "application/json";
+        protected static $appUid;
 
         /**
          * Устанавливает конфигурацию роутинга
@@ -54,8 +55,21 @@ namespace Phasty\Service {
          */
         protected static function getResult($requestedUri, $input) {
             list($class, $method) = static::getClassAndMethod($requestedUri);
-            $instance = new $class;
+            $instance = new $class(static::$appUid);
             return $instance->$method($input);
+        }
+
+        /**
+         * Извлекает идентифтикатор клиента сервиса и сохраняет его в переменную
+         *
+         * @param  mixed  $input    Входяций набор данных
+         */
+        protected static function extractAppUid(&$input) {
+            // Пока работаем только с json
+            if (static::isJson() && isset($input["app-uid"])) {
+                static::$appUid = $input["app-uid"];
+                unset($input["app-uid"]);
+            }
         }
 
         /**
@@ -106,7 +120,13 @@ namespace Phasty\Service {
             ob_start();
             try {
                 static::setFormat($_SERVER["CONTENT_TYPE"]);
-                $result = static::getResult($requestedUri, static::getData());
+
+                $data = static::getData();
+
+                // Извлекаем идентификатор отправителя
+                static::extractAppUid($data);
+
+                $result = static::getResult($requestedUri, $data);
                 // Заворачиваем результат в result. Это необходимо, чтобы сервис мог
                 // возвращать просто строку или число внутри json, а не только объект
                 $result = static::isJson() ? json_encode(["result" => $result]) : $result;
