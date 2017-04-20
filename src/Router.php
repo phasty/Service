@@ -15,7 +15,6 @@ namespace Phasty\Service {
 
         protected static $routes = [];
         protected static $format = "application/json";
-        protected static $appUid;
 
         /**
          * Устанавливает конфигурацию роутинга
@@ -48,31 +47,16 @@ namespace Phasty\Service {
          * Возвращает результат в виде массива.
          * Такая реализация нужна для более простого unit-тестирования.
          *
+         * @param  string $appUid         Идентификатор клиента сервиса
          * @param  string $requestedUri   Запрошенный uri
          * @param  mixed  $input          Входяций набор данных
          *
          * @return array  Результат обработки запроса
          */
-        protected static function getResult($requestedUri, $input) {
+        protected static function getResult($appUid, $requestedUri, $input) {
             list($class, $method) = static::getClassAndMethod($requestedUri);
-            $instance = new $class(static::$appUid);
+            $instance = new $class($appUid);
             return $instance->$method($input);
-        }
-
-        /**
-         * Извлекает идентифтикатор клиента сервиса и сохраняет его в переменную
-         *
-         * @param  mixed  $input    Входяций набор данных
-         */
-        protected static function extractAppUid(&$input) {
-            // Предварительно очищаем статическую переменную
-            static::$appUid = null;
-
-            // Пока работаем только с json
-            if (static::isJson() && array_key_exists("app-uid", $input)) {
-                static::$appUid = $input["app-uid"];
-                unset($input["app-uid"]);
-            }
         }
 
         /**
@@ -124,12 +108,10 @@ namespace Phasty\Service {
             try {
                 static::setFormat($_SERVER["CONTENT_TYPE"]);
 
-                $data = static::getData();
+                // Берем идентификатор отправителя
+                $appUid = isset($_SERVER["HTTP_APP_UID"]) ? $_SERVER["HTTP_APP_UID"] : null;
 
-                // Извлекаем идентификатор отправителя
-                static::extractAppUid($data);
-
-                $result = static::getResult($requestedUri, $data);
+                $result = static::getResult($appUid, $requestedUri, static::getData());
                 // Заворачиваем результат в result. Это необходимо, чтобы сервис мог
                 // возвращать просто строку или число внутри json, а не только объект
                 $result = static::isJson() ? json_encode(["result" => $result]) : $result;
