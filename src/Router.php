@@ -47,14 +47,15 @@ namespace Phasty\Service {
          * Возвращает результат в виде массива.
          * Такая реализация нужна для более простого unit-тестирования.
          *
+         * @param  string $appUid         Идентификатор клиента сервиса
          * @param  string $requestedUri   Запрошенный uri
          * @param  mixed  $input          Входяций набор данных
          *
          * @return array  Результат обработки запроса
          */
-        protected static function getResult($requestedUri, $input) {
+        protected static function getResult($appUid, $requestedUri, $input) {
             list($class, $method) = static::getClassAndMethod($requestedUri);
-            $instance = new $class;
+            $instance = new $class($appUid);
             return $instance->$method($input);
         }
 
@@ -106,7 +107,11 @@ namespace Phasty\Service {
             ob_start();
             try {
                 static::setFormat($_SERVER["CONTENT_TYPE"]);
-                $result = static::getResult($requestedUri, static::getData());
+
+                // Берем идентификатор отправителя
+                $appUid = isset($_SERVER["HTTP_APP_UID"]) ? $_SERVER["HTTP_APP_UID"] : null;
+
+                $result = static::getResult($appUid, $requestedUri, static::getData());
                 // Заворачиваем результат в result. Это необходимо, чтобы сервис мог
                 // возвращать просто строку или число внутри json, а не только объект
                 $result = static::isJson() ? json_encode(["result" => $result]) : $result;

@@ -11,6 +11,22 @@ namespace Phasty\Service {
      */
     abstract class AbstractService {
 
+        private $appUid;
+
+        /**
+         * Конструктор
+         */
+        public function __construct($appUid) {
+            $this->appUid = $appUid;
+        }
+
+        /**
+         * Получает идентификатор клиента сервиса
+         */
+        protected function getAppUid() {
+            return $this->appUid;
+        }
+
         /**
          * Проверяет, что не переданы лишние параметры в сервис
          *
