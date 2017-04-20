@@ -65,6 +65,9 @@ namespace Phasty\Service {
          * @param  mixed  $input    Входяций набор данных
          */
         protected static function extractAppUid(&$input) {
+            // Предварительно очищаем статическую переменную
+            static::$appUid = null;
+
             // Пока работаем только с json
             if (static::isJson() && array_key_exists("app-uid", $input)) {
                 static::$appUid = $input["app-uid"];
