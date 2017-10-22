@@ -13,16 +13,17 @@ namespace Phasty\Service {
      */
     class Router {
 
-        protected static $routes = [];
-        protected static $format = "application/json";
+        protected $routes;
+        protected $format;
 
         /**
          * Устанавливает конфигурацию роутинга
          *
          * @param  array  $routeMappings  Массив ключ(uri) => [class, method]
          */
-        public static function init(array $routeMappings) {
-            static::$routes = $routeMappings;
+        public function init(array $routeMappings = [], $format = "application/json") {
+            $this->routes = $routeMappings;
+            $this->format = $format;
         }
 
         /**
@@ -34,11 +35,11 @@ namespace Phasty\Service {
          *
          * @throws ApiNotImplemented
          */
-        protected static function getClassAndMethod($requestedUri) {
-            if (empty(static::$routes[ $requestedUri ])) {
+        protected function getClassAndMethod($requestedUri) {
+            if (empty($this->routes[ $requestedUri ])) {
                 throw new ApiNotImplemented("Unresolved resource '$requestedUri'.");
             }
-            return static::$routes[ $requestedUri ];
+            return $this->routes[ $requestedUri ];
         }
 
         /**
@@ -53,8 +54,8 @@ namespace Phasty\Service {
          *
          * @return array  Результат обработки запроса
          */
-        protected static function getResult($appUid, $requestedUri, $input) {
-            list($class, $method) = static::getClassAndMethod($requestedUri);
+        protected function getResult($appUid, $requestedUri, $input) {
+            list($class, $method) = $this->getClassAndMethod($requestedUri);
             $instance = new $class($appUid);
             return $instance->$method($input);
         }
@@ -69,7 +70,7 @@ namespace Phasty\Service {
             static $result = null;
             if (!isset($result)) {
                 $result = file_get_contents("php://input");
-                if (static::isJson()) {
+                if ($this->isJson()) {
                     $result = ($result) ? json_decode($result, true) : [];
                 }
             }
@@ -82,8 +83,8 @@ namespace Phasty\Service {
          *
          * @param string $contentType Формат в виде MIME-type
          */
-        public static function setFormat($contentType) {
-            static::$format = empty($contentType) ? "application/json" : $contentType;
+        public function setFormat($contentType) {
+            $this->format = empty($contentType) ? "application/json" : $contentType;
         }
 
         /**
@@ -91,8 +92,8 @@ namespace Phasty\Service {
          *
          * @return boolean  true - если conent-type = application/json
          */
-        protected static function isJson() {
-            return "application/json" == static::$format;
+        protected function isJson() {
+            return "application/json" == $this->format;
         }
 
         /**
@@ -102,19 +103,19 @@ namespace Phasty\Service {
          *
          * @param string $requestedUri  Входящий uri - эквивалентен $_SERVER[ "PHP_SELF" ]
          */
-        public static function route($requestedUri) {
+        public function route($requestedUri) {
             // Копим весь прямой вывод (ошибки, случайное echo от разработчика и т.д.)
             ob_start();
             try {
-                static::setFormat($_SERVER["CONTENT_TYPE"]);
+                $this->setFormat($_SERVER["CONTENT_TYPE"]);
 
                 // Берем идентификатор отправителя
                 $appUid = isset($_SERVER["HTTP_APP_UID"]) ? $_SERVER["HTTP_APP_UID"] : null;
 
-                $result = static::getResult($appUid, $requestedUri, static::getData());
+                $result = $this->getResult($appUid, $requestedUri, $this->getData());
                 // Заворачиваем результат в result. Это необходимо, чтобы сервис мог
                 // возвращать просто строку или число внутри json, а не только объект
-                $result = static::isJson() ? json_encode(["result" => $result]) : $result;
+                $result = $this->isJson() ? json_encode(["result" => $result]) : $result;
             } catch (\Exception $e) {
                 $e = ($e instanceof FatalError) ? $e : new InternalServerError($e->getMessage());
                 http_response_code($e->getHttpStatus());
@@ -127,7 +128,7 @@ namespace Phasty\Service {
                 ob_end_clean();
             }
 
-            header("Content-Type: " . static::$format);
+            header("Content-Type: " . $this->format);
             header("Content-Length: " . strlen($result));
             echo $result;
         }
