@@ -66,7 +66,7 @@ namespace Phasty\Service {
          *
          * @return mixed  Тело запроса, или ассоциативный массив в случае content-type = application/json
          */
-        public static function getData() {
+        public function getData() {
             static $result = null;
             if (!isset($result)) {
                 $result = file_get_contents("php://input");
@@ -121,7 +121,7 @@ namespace Phasty\Service {
                 http_response_code($e->getHttpStatus());
                 // todo: Нужно логировать ошибку. Но про механизм пока не договорились.
                 // log::error("[ERROR: " . $e->getCode() . "] " . $e->getMessage());
-                $result = static::isJson() ?
+                $result = $this->isJson() ?
                     json_encode(["code" => $e->getCode(), "message" => $e->getMessage()]) : $e->getMessage();
             } finally {
                 // Чистим весь левый вывод. Мы должны отдать только результат!
