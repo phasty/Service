@@ -20,8 +20,9 @@ namespace Phasty\Service {
          * Устанавливает конфигурацию роутинга
          *
          * @param  array  $routeMappings  Массив ключ(uri) => [class, method]
+         * @param  string $format
          */
-        public function init(array $routeMappings = [], $format = "application/json") {
+        public function __construct(array $routeMappings = [], $format = "application/json") {
             $this->routes = $routeMappings;
             $this->format = $format;
         }
