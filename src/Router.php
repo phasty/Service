@@ -70,7 +70,7 @@ namespace Phasty\Service {
          *
          * @return array  Результат обработки запроса
          */
-        protected function getResult($requestedUri, $input) {
+        public function getResult($requestedUri, $input) {
             $this->exception = null;
             try {
                 list($class, $method) = $this->getClassAndMethod($requestedUri);
@@ -97,7 +97,7 @@ namespace Phasty\Service {
          *
          * @return mixed  Тело запроса, или ассоциативный массив в случае content-type = application/json
          */
-        public function getData() {
+        protected function getData() {
             static $result = null;
             if (!isset($result)) {
                 $result = file_get_contents("php://input");
