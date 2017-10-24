@@ -12,19 +12,35 @@ namespace Phasty\Service {
      * @package Phasty\Service
      */
     class Router {
-
+        /**
+         * @var  string $routes  Список маршрутов
+         */
         protected $routes;
+        /**
+         * @var  string $format  Формат отдаваемых данных
+         */
         protected $format;
+        /**
+         * @var  string $appUid  Идентификатор клиента сервиса
+         */
+        protected $appUid;
+        /**
+         * @var FatalError $exception  Исключение, полученное в результате обработки запроса
+         */
+        protected $exception;
 
         /**
          * Устанавливает конфигурацию роутинга
          *
          * @param  array  $routeMappings  Массив ключ(uri) => [class, method]
          * @param  string $format
+         * @param  string $appUid  Идентификатор приложения
          */
-        public function __construct(array $routeMappings = [], $format = "application/json") {
+        public function __construct(array $routeMappings = [], $format = null, $appUid = null) {
             $this->routes = $routeMappings;
-            $this->format = $format;
+            $this->setFormat($format);
+            // Берем идентификатор отправителя
+            $this->appUid = $appUid; //isset($_SERVER["HTTP_APP_UID"]) ? $_SERVER["HTTP_APP_UID"] : null;
         }
 
         /**
@@ -49,16 +65,30 @@ namespace Phasty\Service {
          * Возвращает результат в виде массива.
          * Такая реализация нужна для более простого unit-тестирования.
          *
-         * @param  string $appUid         Идентификатор клиента сервиса
          * @param  string $requestedUri   Запрошенный uri
          * @param  mixed  $input          Входяций набор данных
          *
          * @return array  Результат обработки запроса
          */
-        protected function getResult($appUid, $requestedUri, $input) {
-            list($class, $method) = $this->getClassAndMethod($requestedUri);
-            $instance = new $class($appUid);
-            return $instance->$method($input);
+        protected function getResult($requestedUri, $input) {
+            $this->exception = null;
+            try {
+                list($class, $method) = $this->getClassAndMethod($requestedUri);
+                $instance = new $class($this->appUid);
+                $result = $instance->$method($input);
+                // Заворачиваем результат в result. Это необходимо, чтобы сервис мог
+                // возвращать просто строку или число внутри json, а не только объект
+                $result = $this->isJson() ? ["result" => $result] : $result;
+            } catch (\Exception $e) {
+                // Эксепшн ставим тут, т.к. нам нужно получить чистый результат для тестов.
+                $this->exception = ($e instanceof FatalError) ? $e : new InternalServerError($e->getMessage());
+                // todo: Нужно логировать ошибку. Но про механизм пока не договорились.
+                // log::error("[ERROR: " . $e->getCode() . "] " . $e->getMessage());
+                $result = $this->isJson() ?
+                    ["code" => $this->exception->getCode(), "message" => $this->exception->getMessage()] :
+                    $this->exception->getMessage();
+            }
+            return $result;
         }
 
         /**
@@ -91,7 +121,7 @@ namespace Phasty\Service {
         /**
          * Проверяет что текущий формат - json
          *
-         * @return boolean  true - если conent-type = application/json
+         * @return boolean  true - если content-type = application/json
          */
         protected function isJson() {
             return "application/json" == $this->format;
@@ -107,30 +137,17 @@ namespace Phasty\Service {
         public function route($requestedUri) {
             // Копим весь прямой вывод (ошибки, случайное echo от разработчика и т.д.)
             ob_start();
-            try {
-                $this->setFormat($_SERVER["CONTENT_TYPE"]);
 
-                // Берем идентификатор отправителя
-                $appUid = isset($_SERVER["HTTP_APP_UID"]) ? $_SERVER["HTTP_APP_UID"] : null;
-
-                $result = $this->getResult($appUid, $requestedUri, $this->getData());
-                // Заворачиваем результат в result. Это необходимо, чтобы сервис мог
-                // возвращать просто строку или число внутри json, а не только объект
-                $result = $this->isJson() ? json_encode(["result" => $result]) : $result;
-            } catch (\Exception $e) {
-                $e = ($e instanceof FatalError) ? $e : new InternalServerError($e->getMessage());
-                http_response_code($e->getHttpStatus());
-                // todo: Нужно логировать ошибку. Но про механизм пока не договорились.
-                // log::error("[ERROR: " . $e->getCode() . "] " . $e->getMessage());
-                $result = $this->isJson() ?
-                    json_encode(["code" => $e->getCode(), "message" => $e->getMessage()]) : $e->getMessage();
-            } finally {
-                // Чистим весь левый вывод. Мы должны отдать только результат!
-                ob_end_clean();
+            $result = $this->getResult($requestedUri, $this->getData());
+            $result = $this->isJson() ? json_encode($result) : $result;
+            if (!is_null($this->exception)) {
+                http_response_code($this->exception->getHttpStatus());
             }
-
             header("Content-Type: " . $this->format);
             header("Content-Length: " . strlen($result));
+            // Чистим весь левый вывод. Мы должны отдать только результат!
+            ob_end_clean();
+
             echo $result;
         }
 
