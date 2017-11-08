@@ -115,6 +115,11 @@ namespace Phasty\Service {
          * @param string $contentType Формат в виде MIME-type
          */
         public function setFormat($contentType) {
+            $pos = mb_strpos($contentType, ";");
+            if ($pos !== false) {
+                $contentType = mb_substr($contentType, 0, $pos);
+            }
+            $contentType = mb_strtolower($contentType);
             $this->format = empty($contentType) ? "application/json" : $contentType;
         }
 
